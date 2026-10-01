@@ -20,15 +20,16 @@ jobs:
         distribution: 'zulu'
         cache: 'gradle'
 
-    # BARU: Membuat / mendownload ulang file gradlew wrapper secara otomatis di cloud
-    - name: Setup Gradle Wrapper
-      run: gradle wrapper --gradle-version 8.2
+    # MODIFIKASI: Memaksa pembuatan wrapper ke versi 8.4 agar terhindar dari error Gradle 9+
+    - name: Setup Compatible Gradle Wrapper
+      run: gradle wrapper --gradle-version 8.4 --distribution-type bin
 
     - name: Grant Execute Permission for Gradlew
       run: chmod +x gradlew
 
+    # Tambahan flags --no-daemon agar proses build di cloud lebih bersih dan hemat memori
     - name: Build Release APK
-      run: ./gradlew assembleRelease
+      run: ./gradlew assembleRelease --no-daemon
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
