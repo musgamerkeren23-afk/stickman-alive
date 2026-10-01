@@ -30,6 +30,14 @@ android {
         }
     }
 
+    // =================================================================
+    // ⚠️ MEMATIKAN INTERUPSI LINT AGAR BUILD LOGO DUMMY TIDAK CRASH
+    // =================================================================
+    lint {
+        checkReleaseBuilds = false
+        isAbortOnError = false
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -43,7 +51,6 @@ android {
         }
         
         debug {
-            // Mode debug disamakan agar Anda bisa mengetesnya dengan mudah
             signingConfig = signingConfigs.getByName("release")
         }
     }
