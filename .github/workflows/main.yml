@@ -18,16 +18,21 @@ jobs:
       with:
         java-version: '17'
         distribution: 'zulu'
-        cache: 'gradle'
 
-    # MODIFIKASI: Memaksa pembuatan wrapper ke versi 8.4 agar terhindar dari error Gradle 9+
-    - name: Setup Compatible Gradle Wrapper
-      run: gradle wrapper --gradle-version 8.4 --distribution-type bin
+    # SOLUSI UTAMA: Menggunakan Action Resmi Gradle untuk mengunci versi ke 8.4 secara paksa
+    - name: Setup Gradle 8.4
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        gradle-version: '8.4'
 
+    # Opsi tambahan untuk memastikan izin eksekusi aman jika file gradlew Anda ada di repositori
     - name: Grant Execute Permission for Gradlew
-      run: chmod +x gradlew
+      run: |
+        if [ -f gradlew ]; then
+          chmod +x gradlew
+        fi
 
-    # Tambahan flags --no-daemon agar proses build di cloud lebih bersih dan hemat memori
+    # Menjalankan build menggunakan versi yang sudah dikunci oleh setup-gradle di atas
     - name: Build Release APK
       run: ./gradlew assembleRelease --no-daemon
 
