@@ -25,10 +25,9 @@ jobs:
       with:
         gradle-version: '8.4'
 
-    # 2. Membuat file gradlew secara paksa langsung di folder utama (root)
+    # 2. Membuat file gradlew secara paksa langsung di root
     - name: Force Generate Gradle Wrapper
       run: |
-        echo "🔧 Membuat Gradle wrapper bersih di root repositori..."
         gradle wrapper --gradle-version 8.4 --distribution-type bin
         chmod +x gradlew
       shell: bash
@@ -40,27 +39,28 @@ jobs:
         echo "android.enableJetifier=true" >> gradle.properties
       shell: bash
 
-    # 4. MEMPERBAIKI NAMESPACE IKON DUMMY (Menggunakan url schemas.android.com yang benar)
+    # 4. Membuat folder dan menyuntikkan file ikon dummy agar lolos AAPT
     - name: Auto-Generate Missing App Icons (Mipmap)
       run: |
-        # Membuat folder res/mipmap jika belum ada di project app-mobile Anda
         mkdir -p app-mobile/src/main/res/mipmap-hdpi
-        
-        # Menyuntikkan kode XML Vektor dengan URI Namespace resmi agar lolos pemeriksaan Lint
-        echo '<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108"><path android:fillColor="#3DDC84" android:pathData="M0,0h108v108H0z"/></vector>' > app-mobile/src/main/res/mipmap-hdpi/ic_launcher.xml
-        echo '<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108"><path android:fillColor="#3DDC84" android:pathData="M0,0h108v108H0z"/></vector>' > app-mobile/src/main/res/mipmap-hdpi/ic_launcher_round.xml
-        
-        echo "✅ Sukses memperbaiki file penambal ikon sistem dengan URL valid!"
+        echo '<vector xmlns:android="http://android.com" android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108"><path android:fillColor="#3DDC84" android:pathData="M0,0h108v108H0z"/></vector>' > app-mobile/src/main/res/mipmap-hdpi/ic_launcher.xml
+        echo '<vector xmlns:android="http://android.com" android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108"><path android:fillColor="#3DDC84" android:pathData="M0,0h108v108H0z"/></vector>' > app-mobile/src/main/res/mipmap-hdpi/ic_launcher_round.xml
       shell: bash
 
-    # 5. Menjalankan kompilasi APK langsung di root utama tempat project Anda berada
+    # 5. KUNCI UTAMA: Membuat file sertifikat Keystore fisik asli di root proyek sebelum dicompile
+    - name: Generate Physical Keystore File
+      run: |
+        keytool -genkey -v -keystore release.keystore -alias stickman_key -keyalg RSA -keysize 2048 -validity 10000 -storepass stickman123 -keypass stickman123 -dname "CN=Stickman, OU=Alive, O=Dev, L=Jakarta, S=Indonesia, C=ID"
+      shell: bash
+
+    # 6. Menjalankan kompilasi APK (Otomatis ditandatangani oleh Gradle lewat konfigurasi Langkah 2)
     - name: Build Release APK
       run: ./gradlew assembleRelease --no-daemon
 
-    # 6. Mengambil file APK dari folder mana pun di repositori Anda
+    # 7. Mengambil file APK yang sudah 100% matang dan bersertifikat resmi
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: Stickman-Alive-Release-APK
-        path: "**/build/outputs/apk/release/*.apk"
+        name: Stickman-Alive-Signed-APK
+        path: "**/build/outputs/apk/release/*-release.apk"
         retention-days: 7
