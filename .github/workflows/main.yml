@@ -19,8 +19,8 @@ jobs:
         java-version: '17'
         distribution: 'zulu'
 
-    # 1. Mengunci versi Gradle ke 8.4
-    @name: Setup Gradle 8.4
+    # 1. Mengunci versi Gradle ke 8.4 (Sintaks sudah diperbaiki menjadi '-')
+    - name: Setup Gradle 8.4
       uses: gradle/actions/setup-gradle@v4
       with:
         gradle-version: '8.4'
@@ -40,15 +40,13 @@ jobs:
         echo "android.enableJetifier=true" >> gradle.properties
       shell: bash
 
-    # 4. BARU: Membuat folder dan menyuntikkan file ikon default agar build AAPT tidak error
+    # 4. Membuat folder dan menyuntikkan file ikon default agar build AAPT tidak error
     - name: Auto-Generate Missing App Icons (Mipmap)
       run: |
         # Membuat folder res/mipmap jika belum ada di project app-mobile Anda
         mkdir -p app-mobile/src/main/res/mipmap-hdpi
-        mkdir -p app-mobile/src/main/res/mipmap-anydpi-v26
         
-        # Mengubah target ikon di AndroidManifest agar menggunakan ikon default Android (android:icon) jika disukai, 
-        # atau kita buatkan gambar dummy xml kosong agar AAPT berhasil membaca file targetnya.
+        # Membuat gambar dummy xml kosong agar compiler (AAPT) sukses membaca file targetnya
         echo '<vector xmlns:android="http://android.com" android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108"><path android:fillColor="#3DDC84" android:pathData="M0,0h108v108H0z"/></vector>' > app-mobile/src/main/res/mipmap-hdpi/ic_launcher.xml
         echo '<vector xmlns:android="http://android.com" android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108"><path android:fillColor="#3DDC84" android:pathData="M0,0h108v108H0z"/></vector>' > app-mobile/src/main/res/mipmap-hdpi/ic_launcher_round.xml
         
