@@ -2,10 +2,8 @@ name: Build Stickman Alive APK
 
 on:
   push:
-    branches: [ "main" ] # Berjalan otomatis saat push ke branch main secara manual
-  pull_request:
     branches: [ "main" ]
-  workflow_dispatch: # Memungkinkan Anda menjalankan build secara manual dari web GitHub
+  workflow_dispatch:
 
 jobs:
   build:
@@ -22,15 +20,16 @@ jobs:
         distribution: 'zulu'
         cache: 'gradle'
 
-    # Memberikan izin akses eksekusi script gradle lokal Anda
+    # BARU: Membuat / mendownload ulang file gradlew wrapper secara otomatis di cloud
+    - name: Setup Gradle Wrapper
+      run: gradle wrapper --gradle-version 8.2
+
     - name: Grant Execute Permission for Gradlew
       run: chmod +x gradlew
 
-    # Mem-build aplikasi dari source code manual Anda menjadi APK Release
     - name: Build Release APK
       run: ./gradlew assembleRelease
 
-    # Mengunggah APK mentah yang berhasil dicompile agar bisa didownload langsung
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
