@@ -19,48 +19,25 @@ jobs:
         java-version: '17'
         distribution: 'zulu'
 
-    # 1. Mengunci versi Gradle ke 8.4 yang stabil
+    # 1. Mengunci versi Gradle ke 8.4
     - name: Setup Gradle 8.4
       uses: gradle/actions/setup-gradle@v4
       with:
         gradle-version: '8.4'
 
-    # 2. SOLUSI UTAMA: Otomatis mendeteksi lokasi proyek dan membuat file gradlew jika hilang
-    - name: Auto-Generate Missing Gradle Wrapper
+    # 2. Membuat file gradlew secara paksa langsung di folder utama (root)
+    - name: Force Generate Gradle Wrapper
       run: |
-        # Cari di mana letak file build.gradle.kts berada di repositori Anda
-        GRADLE_PROJECT_DIR=$(find . -name "build.gradle.kts" -not -path "*/app/*" -exec dirname {} \;)
-        
-        # Jika tidak ditemukan yang root, cari build.gradle biasa atau folder app
-        if [ -z "$GRADLE_PROJECT_DIR" ]; then
-          GRADLE_PROJECT_DIR=$(find . -name "build.gradle" -not -path "*/app/*" -exec dirname {} \;)
-        fi
-        
-        # Jika masih kosong, asumsikan di root utama
-        if [ -z "$GRADLE_PROJECT_DIR" ]; then
-          GRADLE_PROJECT_DIR="."
-        fi
-        
-        echo "📍 Proyek Anda terdeteksi di direktori: $GRADLE_PROJECT_DIR"
-        cd "$GRADLE_PROJECT_DIR"
-        
-        # Jika file gradlew benar-benar tidak ada di folder tersebut, kita generate otomatis!
-        if [ ! -f gradlew ]; then
-          echo "⚠️ File gradlew tidak ditemukan! Membuat wrapper baru..."
-          gradle wrapper --gradle-version 8.4
-        fi
-        
+        echo "🔧 Membuat Gradle wrapper bersih di root repositori..."
+        gradle wrapper --gradle-version 8.4 --distribution-type bin
         chmod +x gradlew
-        echo "PROJECT_PATH=$GRADLE_PROJECT_DIR" >> $GITHUB_ENV
       shell: bash
 
-    # 3. Menjalankan build langsung di folder proyek yang sudah terdeteksi di atas
+    # 3. Menjalankan kompilasi APK langsung di root utama tempat project Anda berada
     - name: Build Release APK
-      run: |
-        cd ${{ env.PROJECT_PATH }}
-        ./gradlew assembleRelease --no-daemon
+      run: ./gradlew assembleRelease --no-daemon
 
-    # 4. Mengunggah file APK hasil build
+    # 4. Mengambil file APK dari folder app-mobile atau app mana pun di repositori Anda
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
