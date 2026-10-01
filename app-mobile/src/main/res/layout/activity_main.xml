@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.example.stickmanalive.StickmanView
+        android:id="@+id/stickmanView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#F0F0F0" />
+
+    <LinearLayout
+        android:id="@+id/editorPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="#E0E0E0">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🔧 RIGHEADER EDITOR"
+            android:textStyle="bold"
+            android:textSize="18sp"/>
+
+        <EditText
+            android:id="@+id/editName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Masukkan Nama Stickman" />
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Ukuran Kepala" />
+        <SeekBar android:id="@+id/seekHead" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="80"/>
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Panjang Badan (Torso)" />
+        <SeekBar android:id="@+id/seekTorso" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="150"/>
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Panjang Anggota Gerak" />
+        <SeekBar android:id="@+id/seekArms" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="120"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="8dp">
+            <Button android:id="@+id/btnRed" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Merah" android:layout_marginEnd="8dp"/>
+            <Button android:id="@+id/btnBlue" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Biru" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnSaveRig"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Terapkan ke Stickman Live"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="#4CAF50"
+            android:textColor="#FFFFFF"/>
+    </LinearLayout>
+</LinearLayout>
